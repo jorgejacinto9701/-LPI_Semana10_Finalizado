@@ -4,8 +4,11 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,8 +20,10 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
+
+import entidad.Campeonato;
+import model.CampeonatoModel;
+import util.Validaciones;
 
 public class FrmConsultaCampeonato extends JFrame implements ActionListener {
 
@@ -92,7 +97,7 @@ public class FrmConsultaCampeonato extends JFrame implements ActionListener {
 			new Object[][] {
 			},
 			new String[] {
-				"Código", "Nombre", "DNI","Fecha Nacimiento", 
+				"Código", "Nombre", "Año","Estado", 
 			}
 		));
 		scrollPane.setViewportView(table);
@@ -126,8 +131,33 @@ public class FrmConsultaCampeonato extends JFrame implements ActionListener {
 		}
 	}
 	protected void do_btnFiltrar_actionPerformed(ActionEvent arg0) {
+		String nombre = txtNombre.getText();
+		String anio = txtAnio.getText();
+		int estado = cboEstado.getSelectedIndex();
+	
+		int varAnio = 0;
+		if (anio.matches(Validaciones.ANNO)) {
+			varAnio = Integer.parseInt(anio);
+		}
 		
+		int varEstado = 0;
+		switch (estado) {
+			case 0: varEstado = -1;	break;
+			case 1: varEstado = 1;	break;
+			case 2: varEstado = 0;	break;
+		}
 		
+		CampeonatoModel model = new CampeonatoModel();
+		List<Campeonato> lstCampeonato = model.listaCampeonatoPorNombreAnioEstado(nombre, varAnio, varEstado);
+		
+		DefaultTableModel dtm = (DefaultTableModel) table.getModel();
+		dtm.setRowCount(0);
+		
+		Object[] fila = null; 
+		for (Campeonato x : lstCampeonato) {
+			fila = new Object[] {x.getIdCampeonato(), x.getNombre(), x.getAnnio(), x.getEstado()==1?"Activo":"Inactivo"};
+			dtm.addRow(fila);
+		}
 	}
 }
 

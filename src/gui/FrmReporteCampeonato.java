@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -16,6 +17,15 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+
+import entidad.Campeonato;
+import model.CampeonatoModel;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.swing.JRViewer;
+import util.GeneradorReporte;
+import util.Validaciones;
+
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 
@@ -102,7 +112,7 @@ public class FrmReporteCampeonato extends JFrame implements ActionListener {
 		contentPane.add(lblFechaDeInicio);
 		
 		cboEstado = new JComboBox<String>();
-		cboEstado.setModel(new DefaultComboBoxModel<String>(new String[] {"[Seleccione]", "Activo", "Inactivo"}));
+		cboEstado.setModel(new DefaultComboBoxModel<String>(new String[] {"[Todos]", "Activo", "Inactivo"}));
 		cboEstado.setBounds(135, 152, 149, 22);
 		contentPane.add(cboEstado);
 		
@@ -117,7 +127,36 @@ public class FrmReporteCampeonato extends JFrame implements ActionListener {
 		}
 	}
 	protected void do_btnFiltrar_actionPerformed(ActionEvent arg0) {
+		String nombre = txtNombre.getText();
+		String anio = txtAnio.getText();
+		int estado = cboEstado.getSelectedIndex();
 	
+		int varAnio = 0;
+		if (anio.matches(Validaciones.ANNO)) {
+			varAnio = Integer.parseInt(anio);
+		}
+		
+		int varEstado = 0;
+		switch (estado) {
+			case 0: varEstado = -1;	break;
+			case 1: varEstado = 1;	break;
+			case 2: varEstado = 0;	break;
+		}
+		
+		CampeonatoModel model = new CampeonatoModel();
+		List<Campeonato> lstCampeonato = model.listaCampeonatoPorNombreAnioEstado(nombre, varAnio, varEstado);
+
+		JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(lstCampeonato);
+		String jasper = "reporteCampeonato.jasper";	
+		
+		JasperPrint print = GeneradorReporte.genera(jasper, dataSource, null);
+		
+		JRViewer jRViewer = new JRViewer(print);
+		
+		panelReporte.removeAll();
+		panelReporte.add(jRViewer);
+		panelReporte.repaint();
+		panelReporte.revalidate();
 		
 		
 	}

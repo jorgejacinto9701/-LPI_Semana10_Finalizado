@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,6 +18,9 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+
+import entidad.Docente;
+import model.DocenteModel;
 
 public class FrmConsultaDocente extends JFrame implements ActionListener {
 
@@ -134,10 +138,32 @@ public class FrmConsultaDocente extends JFrame implements ActionListener {
 		}
 	}
 	protected void do_btnFiltrar_actionPerformed(ActionEvent arg0) {
+		String nombre = txtNombre.getText();
+		String dni = txtDNI.getText();
+		String desde = txtInicio.getText();
+		String hasta = txtFin.getText();
+		
+		DocenteModel model = new DocenteModel();
+		List<Docente> lstDocente = model.consultaPorNombreDNIFecha(nombre, dni, desde, hasta);
+		
+		DefaultTableModel dtm = (DefaultTableModel) table.getModel();
+		dtm.setRowCount(0);
+		
+		Object[] fila = null; 
+		for (Docente x : lstDocente) {
+			fila = new Object[] {x.getIdDocente(), x.getNombre(), x.getDni(), x.getFechaNacimiento()};
+			dtm.addRow(fila);
+		}
 		
 		
 	}
 }
+
+
+
+
+
+
 
 
 

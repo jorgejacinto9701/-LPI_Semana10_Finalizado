@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -16,6 +17,13 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+
+import entidad.Docente;
+import model.DocenteModel;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.swing.JRViewer;
+import util.GeneradorReporte;
 
 public class FrmReporteDocente extends JFrame implements ActionListener {
 
@@ -125,7 +133,25 @@ public class FrmReporteDocente extends JFrame implements ActionListener {
 		}
 	}
 	protected void do_btnFiltrar_actionPerformed(ActionEvent arg0) {
-	
+		String nombre = txtNombre.getText();
+		String dni = txtDNI.getText();
+		String desde = txtInicio.getText();
+		String hasta = txtFin.getText();
+		
+		DocenteModel model = new DocenteModel();
+		List<Docente> lstDocente = model.consultaPorNombreDNIFecha(nombre, dni, desde, hasta);
+		
+		JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(lstDocente);
+		String jasper = "reporteDocente.jasper";	
+		
+		JasperPrint print = GeneradorReporte.genera(jasper, dataSource, null);
+		
+		JRViewer jRViewer = new JRViewer(print);
+		
+		panelReporte.removeAll();
+		panelReporte.add(jRViewer);
+		panelReporte.repaint();
+		panelReporte.revalidate();
 		
 		
 	}
